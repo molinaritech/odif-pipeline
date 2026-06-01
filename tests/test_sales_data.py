@@ -1,10 +1,9 @@
 import pandas as pd
 
-from src.config import PROCESSED_SALES_DATA_FILE
 from src.data.sales_data import save_processed_sales_data
 
 
-def test_save_processed_sales_data_creates_file() -> None:
+def test_save_processed_sales_data_creates_file(tmp_path) -> None:
     sales_df = pd.DataFrame(
         {
             "product": ["Widget A"],
@@ -14,6 +13,8 @@ def test_save_processed_sales_data_creates_file() -> None:
         }
     )
     
-    save_processed_sales_data(sales_df)
+    output_file = tmp_path / "sales_data_processed.csv"
+    
+    save_processed_sales_data(sales_df, output_file)
 
-    assert PROCESSED_SALES_DATA_FILE.exists()
+    assert output_file.exists()

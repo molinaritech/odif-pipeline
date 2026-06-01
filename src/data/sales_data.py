@@ -1,5 +1,7 @@
 import pandas as pd
 
+from pathlib import Path
+
 from src.config import (
     SALES_DATA_FILE,
     PROCESSED_SALES_DATA_FILE,
@@ -24,14 +26,17 @@ def save_sales_data(df: pd.DataFrame) -> None:
         SALES_DATA_FILE, index = False
     )
 
-def save_processed_sales_data(df: pd.DataFrame) -> None:
-    PROCESSED_SALES_DATA_FILE.parent.mkdir(
+def save_processed_sales_data(
+        df: pd.DataFrame,
+        output_file: Path = PROCESSED_SALES_DATA_FILE,
+    ) -> None:
+    output_file.parent.mkdir(
         parents=True,
         exist_ok=True,
     )
 
     df.to_csv(
-        PROCESSED_SALES_DATA_FILE,
+        output_file,
         index=False,
     )
 
