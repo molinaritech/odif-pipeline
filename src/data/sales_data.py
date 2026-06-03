@@ -16,14 +16,18 @@ def generate_sales_data() -> pd.DataFrame:
 
     return pd.DataFrame(data)
 
-def save_sales_data(df: pd.DataFrame) -> None:
-    SALES_DATA_FILE.parent.mkdir(
+def save_sales_data(
+        df: pd.DataFrame,
+        output_file: Path = SALES_DATA_FILE
+) -> None:
+    output_file.parent.mkdir(
         parents=True,
         exist_ok=True,
     )
     
     df.to_csv(
-        SALES_DATA_FILE, index = False
+        output_file,
+        index = False,
     )
 
 def save_processed_sales_data(
@@ -41,5 +45,7 @@ def save_processed_sales_data(
     )
 
 
-def load_sales_data() -> pd.DataFrame:
-    return pd.read_csv(SALES_DATA_FILE)
+def load_sales_data(
+          input_file: Path = SALES_DATA_FILE,
+) -> pd.DataFrame:
+    return pd.read_csv(input_file)
