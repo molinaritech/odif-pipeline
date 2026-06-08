@@ -5,7 +5,11 @@ from src.db.connection import get_connection
 from src.db.load_dataframe import load_dataframe_to_table
 from src.db.query import query_to_dataframe
 from pathlib import Path
-from src.db.business_queries import get_revenue_by_product, get_total_revenue
+from src.db.business_queries import (
+    get_revenue_by_product,
+    get_total_revenue,
+    get_product_revenue_ranking,
+)
 
 TABLE_NAME = "processed_sales"
 
@@ -134,5 +138,21 @@ def test_get_total_revenue_returns_expected_result(
 
     assert len(result_df) == 1
     assert result_df.iloc[0]["total_revenue"] == 400.00
+
+    connection.close()
+
+
+def test_get_product_revenue_ranking_returns_expected_results(
+        tmp_path: Path
+) -> None:
+    connection = create_processed_sales_test_table(tmp_path)
+
+    result_df = get_product_revenue_ranking(connection)
+
+    assert len(result_df) == 4
+
+    assert result_df.iloc[0]["product"] == "Mug"
+    assert result_df.iloc[0]["revenue"] == 150.00
+    assert result_df.iloc[0]["revenue_rank"] == 1
 
     connection.close()

@@ -31,3 +31,21 @@ def get_total_revenue(
         """,
         connection,
     )
+
+
+def get_product_revenue_ranking(
+        connection: sqlite3.Connection,
+) -> pd.DataFrame:
+    return query_to_dataframe(
+        """
+        SELECT
+            product,
+            revenue,
+            RANK() OVER (
+                ORDER BY revenue DESC
+            ) AS revenue_rank
+        FROM processed_sales
+        ORDER BY revenue_rank
+        """,
+        connection,
+    )
