@@ -1,8 +1,11 @@
-from src.db.connection import get_connection
-from src.db.load_dataframe import load_dataframe_to_table
-
 import pandas as pd
 import sqlite3
+
+from src.db.connection import get_connection
+from src.db.load_dataframe import load_dataframe_to_table
+from src.db.query import query_to_dataframe
+from pathlib import Path
+from src.db.business_queries import get_revenue_by_product
 
 TABLE_NAME = "processed_sales"
 
@@ -82,3 +85,41 @@ def test_total_revenue_query(tmp_path) -> None:
         FROM {TABLE_NAME}
         """
     )
+
+
+def test_query_to_dataframe_returns_sql_results(
+        tmp_path: Path
+) -> None:
+    connection = create_processed_sales_test_table(tmp_path)
+
+    result_df = query_to_dataframe(
+        """
+        SELECT
+            product,
+            revenue
+        FROM processed_sales
+        ORDER BY revenue DESC
+        """,
+        connection,
+    )
+
+    assert len(result_df) == 4
+    assert result_df.iloc[0]["product"] == "Mug"
+    assert result_df.iloc[0]["revenue"] == 150.00
+
+    connection.close()
+
+
+def test_get_revenue_by_product_returns_expected_results(
+        tmp_path: Path
+) -> None:
+    connection = create_processed_sales_test_table(tmp_path)
+
+    result_df = get_revenue_by_product(connection)
+
+    assert len(result_df) == 4
+    
+    assert result_df.iloc[0]["product"] == "Mug"
+    assert result_df.iloc[0]["total_revenue"] == 150.00
+
+    connection.close()
