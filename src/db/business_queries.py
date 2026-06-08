@@ -114,3 +114,21 @@ def get_product_revenue_share(
         """,
         connection,
     )
+
+
+def get_product_quantity_ranking(
+        connection: sqlite3.Connection,
+) -> pd.DataFrame:
+    return query_to_dataframe(
+        """
+        SELECT
+            product,
+            quantity,
+            RANK() OVER (
+                ORDER BY quantity DESC
+            ) AS quantity_rank
+        FROM processed_sales
+        ORDER BY quantity_rank
+        """,
+        connection,
+    )

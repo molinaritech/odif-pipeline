@@ -13,6 +13,7 @@ from src.db.business_queries import (
     get_total_quantity_sold,
     get_quantity_by_product,
     get_product_revenue_share,
+    get_product_quantity_ranking,
 )
 
 TABLE_NAME = "processed_sales"
@@ -217,5 +218,21 @@ def test_get_product_revenue_share_returns_expected_results(
     assert result_df.iloc[0]["product"] == "Mug"
     assert result_df.iloc[0]["revenue"] == 150.00
     assert result_df.iloc[0]["revenue_share_pct"] == 37.50
+
+    connection.close()
+
+
+def test_get_product_quantity_ranking(
+        tmp_path: Path
+) -> None:
+    connection = create_processed_sales_test_table(tmp_path)
+
+    result_df = get_product_quantity_ranking(connection)
+
+    assert len(result_df) == 4
+
+    assert result_df.iloc[0]["product"] == "Sticker"
+    assert result_df.iloc[0]["quantity"] == 40
+    assert result_df.iloc[0]["quantity_rank"] == 1
 
     connection.close()
