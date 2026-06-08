@@ -10,6 +10,7 @@ from src.db.business_queries import (
     get_total_revenue,
     get_product_revenue_ranking,
     get_top_product_by_revenue,
+    get_total_quantity_sold,
 )
 
 TABLE_NAME = "processed_sales"
@@ -173,4 +174,15 @@ def test_get_top_product_by_revenue_returns_expected_result(
 
     connection.close()
 
-    
+
+def test_get_total_quantity_sold_returns_expected_result(
+        tmp_path: Path
+) -> None:
+    connection = create_processed_sales_test_table(tmp_path)
+
+    result_df = get_total_quantity_sold(connection)
+
+    assert len(result_df) == 1
+    assert result_df.iloc[0]["total_quantity"] == 110
+
+    connection.close()

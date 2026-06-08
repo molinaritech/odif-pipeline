@@ -50,6 +50,7 @@ def get_product_revenue_ranking(
         connection,
     )
 
+
 def get_top_product_by_revenue(
         connection: sqlite3.Connection,
 ) -> pd.DataFrame:
@@ -61,6 +62,19 @@ def get_top_product_by_revenue(
         FROM processed_sales
         ORDER BY revenue DESC
         LIMIT 1
+        """,
+        connection,
+    )
+
+
+def get_total_quantity_sold(
+        connection: sqlite3.Connection,
+) -> pd.DataFrame:
+    return query_to_dataframe(
+        """
+        SELECT
+            SUM(quantity) AS total_quantity
+        FROM processed_sales
         """,
         connection,
     )
