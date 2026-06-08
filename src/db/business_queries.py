@@ -18,3 +18,16 @@ def get_revenue_by_product(
         """,
         connection,
     )
+
+
+def get_total_revenue(
+        connection: sqlite3.Connection,
+) -> pd.DataFrame:
+    return query_to_dataframe(
+        """
+        SELECT
+            SUM(revenue) AS total_revenue
+        FROM processed_sales
+        """,
+        connection,
+    )

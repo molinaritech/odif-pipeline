@@ -5,7 +5,7 @@ from src.db.connection import get_connection
 from src.db.load_dataframe import load_dataframe_to_table
 from src.db.query import query_to_dataframe
 from pathlib import Path
-from src.db.business_queries import get_revenue_by_product
+from src.db.business_queries import get_revenue_by_product, get_total_revenue
 
 TABLE_NAME = "processed_sales"
 
@@ -121,5 +121,18 @@ def test_get_revenue_by_product_returns_expected_results(
     
     assert result_df.iloc[0]["product"] == "Mug"
     assert result_df.iloc[0]["total_revenue"] == 150.00
+
+    connection.close()
+
+
+def test_get_total_revenue_returns_expected_result(
+        tmp_path: Path
+) -> None:
+    connection = create_processed_sales_test_table(tmp_path)
+
+    result_df = get_total_revenue(connection)
+
+    assert len(result_df) == 1
+    assert result_df.iloc[0]["total_revenue"] == 400.00
 
     connection.close()
