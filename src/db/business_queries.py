@@ -94,3 +94,23 @@ def get_quantity_by_product(
         """,
         connection,
     )
+
+
+def get_product_revenue_share(
+        connection: sqlite3.Connection,
+) -> pd.DataFrame:
+    return query_to_dataframe(
+        """
+        SELECT
+            product,
+            revenue,
+            ROUND(
+                (revenue* 100.0) /
+                (SUM(revenue) OVER ()),
+                2
+            ) AS revenue_share_pct
+        FROM processed_sales
+        ORDER BY revenue_share_pct DESC
+        """,
+        connection,
+    )
