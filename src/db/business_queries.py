@@ -78,3 +78,19 @@ def get_total_quantity_sold(
         """,
         connection,
     )
+
+
+def get_quantity_by_product(
+        connection: sqlite3.Connection,
+) -> pd.DataFrame:
+    return query_to_dataframe(
+        """
+        SELECT
+            product,
+            SUM(quantity) AS total_quantity
+        FROM processed_sales
+        GROUP BY product
+        ORDER BY total_quantity DESC
+        """,
+        connection,
+    )
