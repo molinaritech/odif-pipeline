@@ -15,6 +15,8 @@ from src.db.business_queries import (
     get_product_revenue_share,
     get_product_quantity_ranking,
 )
+from src.reporting.business_summary import save_business_summary_report
+
 
 TABLE_NAME = "processed_sales"
 
@@ -236,3 +238,23 @@ def test_get_product_quantity_ranking(
     assert result_df.iloc[0]["quantity_rank"] == 1
 
     connection.close()
+
+
+def test_business_summary_report_saves_to_csv(
+        tmp_path
+) -> None:
+    report_path = tmp_path / "business_summary.csv"
+
+    summary_df = pd.DataFrame(
+        {
+            "product": ["Mug", "Notebook"],
+            "total_revenue": [150.00, 125.00],
+        }
+    )
+
+    save_business_summary_report(summary_df, report_path)
+
+    saved_report_df = pd.read_csv(report_path)
+
+    assert len(saved_report_df) == 2
+    assert list(saved_report_df.columns) == ["product", "total_revenue"]
