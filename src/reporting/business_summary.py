@@ -4,6 +4,7 @@ from src.db.business_queries import (
     get_top_product_by_revenue,
     get_total_quantity_sold,
     get_total_revenue,
+    get_product_revenue_share,
 )
 
 
@@ -24,6 +25,12 @@ def generate_revenue_by_product_report(
         connection: sqlite3.Connection,
 ) -> pd.DataFrame:
     return get_revenue_by_product(connection)
+
+
+def generate_product_revenue_share_report(
+        connection: sqlite3.Connection,
+) ->pd.DataFrame:
+    return get_product_revenue_share(connection)
 
 
 def generate_business_summary(

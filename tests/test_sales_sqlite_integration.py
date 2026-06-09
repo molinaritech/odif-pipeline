@@ -20,6 +20,7 @@ from src.reporting.business_summary import(
     generate_revenue_by_product_report,
     save_business_summary_report,
     generate_business_summary,
+    generate_product_revenue_share_report,
 )
 
 
@@ -28,18 +29,10 @@ TABLE_NAME = "processed_sales"
 
 
 def create_processed_sales_test_table(
-        tmp_path,
+        tmp_path: Path,
+        processed_sales_df: pd.DataFrame,
 ) -> sqlite3.Connection:
     db_path = tmp_path / "test_odif.db"
-
-    processed_sales_df = pd.DataFrame(
-        {
-            "product": ["Notebook", "Sticker", "Mug", "Pen"],
-            "quantity": [25, 40, 15, 30],
-            "revenue": [125.00, 80.00, 150.00, 45.00],
-            "unit_price": [5.00, 2.00, 10.00, 1.50],
-        }
-    )
 
     connection = get_connection(db_path)
 
@@ -52,10 +45,16 @@ def create_processed_sales_test_table(
     return connection
 
 
-def test_processed_sales_data_loads_to_sqlite_table(tmp_path) -> None:
+def test_processed_sales_data_loads_to_sqlite_table(
+        tmp_path: Path,
+        processed_sales_df: pd.DataFrame,
+) -> None:
     db_path = tmp_path / "test_odif.db"
 
-    connection = create_processed_sales_test_table(tmp_path)
+    connection = create_processed_sales_test_table(
+        tmp_path,
+        processed_sales_df,
+        )
 
     row_count = connection.execute(
         f"SELECT COUNT(*) FROM {TABLE_NAME}"
@@ -71,10 +70,16 @@ def test_processed_sales_data_loads_to_sqlite_table(tmp_path) -> None:
     assert total_revenue == 400.00
 
 
-def test_highest_revenue_product_query(tmp_path) -> None:
+def test_highest_revenue_product_query(
+        tmp_path: Path,
+        processed_sales_df: pd.DataFrame,
+) -> None:
     db_path = tmp_path / "test_odif.db"
 
-    connection = create_processed_sales_test_table(tmp_path)
+    connection = create_processed_sales_test_table(
+        tmp_path,
+        processed_sales_df,
+        )
 
     result = connection.execute(
         f"""
@@ -91,10 +96,16 @@ def test_highest_revenue_product_query(tmp_path) -> None:
     assert result[1] == 150.00
 
 
-def test_total_revenue_query(tmp_path) -> None:
+def test_total_revenue_query(
+        tmp_path: Path,
+        processed_sales_df: pd.DataFrame,
+) -> None:
     db_path = tmp_path / "test_odif.db"
 
-    connection = create_processed_sales_test_table(tmp_path)
+    connection = create_processed_sales_test_table(
+        tmp_path,
+        processed_sales_df,
+        )
 
     result = connection.execute(
         f"""
@@ -105,9 +116,13 @@ def test_total_revenue_query(tmp_path) -> None:
 
 
 def test_query_to_dataframe_returns_sql_results(
-        tmp_path: Path
+        tmp_path: Path,
+        processed_sales_df: pd.DataFrame,
 ) -> None:
-    connection = create_processed_sales_test_table(tmp_path)
+    connection = create_processed_sales_test_table(
+        tmp_path,
+        processed_sales_df,
+        )
 
     result_df = query_to_dataframe(
         """
@@ -128,9 +143,13 @@ def test_query_to_dataframe_returns_sql_results(
 
 
 def test_get_revenue_by_product_returns_expected_results(
-        tmp_path: Path
+        tmp_path: Path,
+        processed_sales_df: pd.DataFrame,
 ) -> None:
-    connection = create_processed_sales_test_table(tmp_path)
+    connection = create_processed_sales_test_table(
+        tmp_path,
+        processed_sales_df,
+        )
 
     result_df = get_revenue_by_product(connection)
 
@@ -143,9 +162,13 @@ def test_get_revenue_by_product_returns_expected_results(
 
 
 def test_get_total_revenue_returns_expected_result(
-        tmp_path: Path
+        tmp_path: Path,
+        processed_sales_df: pd.DataFrame,
 ) -> None:
-    connection = create_processed_sales_test_table(tmp_path)
+    connection = create_processed_sales_test_table(
+        tmp_path,
+        processed_sales_df,
+        )
 
     result_df = get_total_revenue(connection)
 
@@ -156,9 +179,13 @@ def test_get_total_revenue_returns_expected_result(
 
 
 def test_get_product_revenue_ranking_returns_expected_results(
-        tmp_path: Path
+        tmp_path: Path,
+        processed_sales_df: pd.DataFrame,
 ) -> None:
-    connection = create_processed_sales_test_table(tmp_path)
+    connection = create_processed_sales_test_table(
+        tmp_path,
+        processed_sales_df,
+        )
 
     result_df = get_product_revenue_ranking(connection)
 
@@ -172,9 +199,13 @@ def test_get_product_revenue_ranking_returns_expected_results(
 
 
 def test_get_top_product_by_revenue_returns_expected_result(
-        tmp_path: Path
+        tmp_path: Path,
+        processed_sales_df: pd.DataFrame,
 ) -> None:
-    connection = create_processed_sales_test_table(tmp_path)
+    connection = create_processed_sales_test_table(
+        tmp_path,
+        processed_sales_df
+        )
 
     result_df = get_top_product_by_revenue(connection)
 
@@ -187,9 +218,13 @@ def test_get_top_product_by_revenue_returns_expected_result(
 
 
 def test_get_total_quantity_sold_returns_expected_result(
-        tmp_path: Path
+        tmp_path: Path,
+        processed_sales_df: pd.DataFrame,
 ) -> None:
-    connection = create_processed_sales_test_table(tmp_path)
+    connection = create_processed_sales_test_table(
+        tmp_path,
+        processed_sales_df
+        )
 
     result_df = get_total_quantity_sold(connection)
 
@@ -200,9 +235,13 @@ def test_get_total_quantity_sold_returns_expected_result(
 
 
 def test_get_quantity_by_product_returns_expected_results(
-        tmp_path: Path
+        tmp_path: Path,
+        processed_sales_df: pd.DataFrame,
 ) -> None:
-    connection = create_processed_sales_test_table(tmp_path)
+    connection = create_processed_sales_test_table(
+        tmp_path,
+        processed_sales_df
+        )
 
     result_df = get_quantity_by_product(connection)
 
@@ -215,9 +254,13 @@ def test_get_quantity_by_product_returns_expected_results(
 
 
 def test_get_product_revenue_share_returns_expected_results(
-        tmp_path: Path
+        tmp_path: Path,
+        processed_sales_df: pd.DataFrame,
 ) -> None:
-    connection = create_processed_sales_test_table(tmp_path)
+    connection = create_processed_sales_test_table(
+        tmp_path,
+        processed_sales_df
+        )
 
     result_df = get_product_revenue_share(connection)
 
@@ -231,9 +274,13 @@ def test_get_product_revenue_share_returns_expected_results(
 
 
 def test_get_product_quantity_ranking(
-        tmp_path: Path
+        tmp_path: Path,
+        processed_sales_df: pd.DataFrame,
 ) -> None:
-    connection = create_processed_sales_test_table(tmp_path)
+    connection = create_processed_sales_test_table(
+        tmp_path,
+        processed_sales_df,
+        )
 
     result_df = get_product_quantity_ranking(connection)
 
@@ -247,7 +294,7 @@ def test_get_product_quantity_ranking(
 
 
 def test_business_summary_report_saves_to_csv(
-        tmp_path
+        tmp_path: Path,
 ) -> None:
     report_path = tmp_path / "business_summary.csv"
 
@@ -267,18 +314,10 @@ def test_business_summary_report_saves_to_csv(
 
 
 def test_generate_revenue_by_product_report_returns_summary_dataframe(
-        tmp_path
+        tmp_path: Path,
+        processed_sales_df: pd.DataFrame,
 ) -> None:
     db_path = tmp_path / "test_odif.db"
-
-    processed_sales_df = pd.DataFrame(
-        {
-            "product": ["Notebook", "Sticker", "Mug", "Pen"],
-            "quantity": [25, 40, 15, 30],
-            "revenue": [125.00, 80.00, 150.00, 45.00],
-            "unit_price": [5.00, 2.00, 10.00, 1.50],
-        }
-    )
 
     connection = get_connection(db_path)
 
@@ -297,18 +336,11 @@ def test_generate_revenue_by_product_report_returns_summary_dataframe(
 
 
 def test_generate_business_summary_returns_kpi_dataframe(
-        tmp_path,
+        tmp_path: Path,
+        processed_sales_df: pd.DataFrame,
 ) -> None:
     db_path = tmp_path / "test_odif.db"
 
-    processed_sales_df = pd.DataFrame(
-        {
-            "product": ["Notebook", "Sticker", "Mug", "Pen"],
-            "quantity": [25, 40, 15, 30],
-            "revenue": [125.00, 80.00, 150.00, 45.00],
-            "unit_price": [5.00, 2.00, 10.00, 1.50],
-        }
-    )
 
     connection = get_connection(db_path)
 
@@ -330,3 +362,30 @@ def test_generate_business_summary_returns_kpi_dataframe(
     assert summary_df.iloc[0]["total_revenue"] == 400.00
     assert summary_df.iloc[0]["total_quantity_sold"] == 110
     assert summary_df.iloc[0]["top_product"] == "Mug"
+
+
+def test_generate_product_revenue_share_report_returns_share_dataframe(
+        tmp_path: Path,
+        processed_sales_df: pd.DataFrame,
+) -> None:
+    
+    db_path = tmp_path / "test_odif.db"
+
+    connection = get_connection(db_path)
+
+    load_dataframe_to_table(
+        processed_sales_df,
+        TABLE_NAME,
+        connection,
+    )
+
+    report_df = generate_product_revenue_share_report(connection)
+
+    assert len(report_df) == 4
+    assert list(report_df.columns) == [
+        "product",
+        "revenue",
+        "revenue_share_pct",
+    ]
+    assert report_df.iloc[0]["product"] == "Mug"
+    assert report_df.iloc[0]["revenue_share_pct"] == 37.5
