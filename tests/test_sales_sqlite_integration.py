@@ -18,6 +18,8 @@ from src.db.business_queries import (
 from src.reporting.business_summary import(
     save_business_summary_report,
     generate_revenue_by_product_report,
+    save_business_summary_report,
+    generate_business_summary,
 )
 
 
@@ -292,4 +294,39 @@ def test_generate_revenue_by_product_report_returns_summary_dataframe(
     assert list(report_df.columns) == ["product", "total_revenue"]
     assert report_df.iloc[0]["product"] == "Mug"
     assert report_df.iloc[0]["total_revenue"] == 150.00
-    
+
+
+def test_generate_business_summary_returns_kpi_dataframe(
+        tmp_path,
+) -> None:
+    db_path = tmp_path / "test_odif.db"
+
+    processed_sales_df = pd.DataFrame(
+        {
+            "product": ["Notebook", "Sticker", "Mug", "Pen"],
+            "quantity": [25, 40, 15, 30],
+            "revenue": [125.00, 80.00, 150.00, 45.00],
+            "unit_price": [5.00, 2.00, 10.00, 1.50],
+        }
+    )
+
+    connection = get_connection(db_path)
+
+    load_dataframe_to_table(
+        processed_sales_df,
+        TABLE_NAME,
+        connection,
+    )
+
+    summary_df = generate_business_summary(connection)
+
+    assert len(summary_df) == 1
+    assert list(summary_df.columns) == [
+        "total_revenue",
+        "total_quantity_sold",
+        "top_product",
+    ]
+
+    assert summary_df.iloc[0]["total_revenue"] == 400.00
+    assert summary_df.iloc[0]["total_quantity_sold"] == 110
+    assert summary_df.iloc[0]["top_product"] == "Mug"
