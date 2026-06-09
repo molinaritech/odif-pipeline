@@ -18,7 +18,6 @@ from src.db.business_queries import (
 from src.reporting.business_summary import(
     save_business_summary_report,
     generate_revenue_by_product_report,
-    save_business_summary_report,
     generate_business_summary,
     generate_product_revenue_share_report,
 )
@@ -49,12 +48,10 @@ def test_processed_sales_data_loads_to_sqlite_table(
         tmp_path: Path,
         processed_sales_df: pd.DataFrame,
 ) -> None:
-    db_path = tmp_path / "test_odif.db"
-
     connection = create_processed_sales_test_table(
         tmp_path,
         processed_sales_df,
-        )
+    )
 
     row_count = connection.execute(
         f"SELECT COUNT(*) FROM {TABLE_NAME}"
@@ -74,12 +71,10 @@ def test_highest_revenue_product_query(
         tmp_path: Path,
         processed_sales_df: pd.DataFrame,
 ) -> None:
-    db_path = tmp_path / "test_odif.db"
-
     connection = create_processed_sales_test_table(
         tmp_path,
         processed_sales_df,
-        )
+    )
 
     result = connection.execute(
         f"""
@@ -100,12 +95,10 @@ def test_total_revenue_query(
         tmp_path: Path,
         processed_sales_df: pd.DataFrame,
 ) -> None:
-    db_path = tmp_path / "test_odif.db"
-
     connection = create_processed_sales_test_table(
         tmp_path,
         processed_sales_df,
-        )
+    )
 
     result = connection.execute(
         f"""
@@ -317,14 +310,9 @@ def test_generate_revenue_by_product_report_returns_summary_dataframe(
         tmp_path: Path,
         processed_sales_df: pd.DataFrame,
 ) -> None:
-    db_path = tmp_path / "test_odif.db"
-
-    connection = get_connection(db_path)
-
-    load_dataframe_to_table(
+    connection = create_processed_sales_test_table(
+        tmp_path,
         processed_sales_df,
-        TABLE_NAME,
-        connection,
     )
 
     report_df = generate_revenue_by_product_report(connection)
@@ -339,15 +327,9 @@ def test_generate_business_summary_returns_kpi_dataframe(
         tmp_path: Path,
         processed_sales_df: pd.DataFrame,
 ) -> None:
-    db_path = tmp_path / "test_odif.db"
-
-
-    connection = get_connection(db_path)
-
-    load_dataframe_to_table(
+    connection = create_processed_sales_test_table(
+        tmp_path,
         processed_sales_df,
-        TABLE_NAME,
-        connection,
     )
 
     summary_df = generate_business_summary(connection)
